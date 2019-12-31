@@ -16,8 +16,8 @@ namespace BatteryScreamer
     {
         const int JOB_ID = 41383;
 
-        TextView Info, Status;
-        Button Start, Stop;
+        TextView Info, PSource, CStatus;
+        Switch JobToggle;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -26,17 +26,17 @@ namespace BatteryScreamer
             SetContentView(Resource.Layout.main);
 
             Info = FindViewById<TextView>(Resource.Id.info);
-            Status = FindViewById<TextView>(Resource.Id.status);
-            Start = FindViewById<Button>(Resource.Id.scheduleJob);
-            Stop = FindViewById<Button>(Resource.Id.cancelJob);
+            PSource = FindViewById<TextView>(Resource.Id.psource);
+            CStatus = FindViewById<TextView>(Resource.Id.cstatus);
+
+            JobToggle = FindViewById<Switch>(Resource.Id.jstatus);
 
             Init();
         }
 
         void Init()
         {
-            Start.Click += delegate { ScheduleJob(); };
-            Stop.Click += delegate { CancelJob(); };
+            JobToggle.Click += delegate { if (JobToggle.Checked) ScheduleJob(); else CancelJob(); };
 
             UpdateInfo();
             Battery.BatteryInfoChanged += delegate { UpdateInfo(); };
@@ -52,18 +52,19 @@ namespace BatteryScreamer
             });
         }
 
-        void UpdateInfo() => Info.Text = $"Level: {Battery.ChargeLevel * 100}%\nSource: {Battery.PowerSource.ToString()}\nStatus: {Battery.State.ToString()}";
+        void UpdateInfo()
+        {
+            PSource.Text = Battery.PowerSource.ToString();
+            CStatus.Text = Battery.State.ToString();
+            Info.Text = $"{Battery.ChargeLevel * 100}%";
+        }
 
         void UpdateJobStatus(bool? isActive = null)
         {
             if (!isActive.HasValue)
                 isActive = ((JobScheduler)GetSystemService(JobSchedulerService)).AllPendingJobs.Any(j => j.Id == JOB_ID);
 
-            var ColorResource = isActive.Value ? Resource.Color.colorHappy : Resource.Color.colorDanger;
-            var Color = Build.VERSION.SdkInt >= BuildVersionCodes.M ? Resources.GetColor(ColorResource, null) : Resources.GetColor(ColorResource);
-
-            Status.Text = $"Alerts are " + (isActive.Value ? "Active" : "Inactive");
-            Status.SetTextColor(Color);
+            JobToggle.Checked = isActive.Value;
         }
 
         void ScheduleJob()

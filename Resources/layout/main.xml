@@ -11,53 +11,76 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textAlignment="center"
-        android:textSize="20dp"
-        android:padding="10dp"
-        android:textColor="@color/colorText"
-        android:background="@color/colorTitle"/>
+        android:textSize="24sp"
+        android:padding="8sp"/>
     <TextView
         android:id="@+id/info"
+        android:textStyle="bold"
         android:gravity="center"
         android:layout_weight="1"
-        android:background="@color/colorBG"
-        android:textColor="@color/colorText"
-        android:textSize="28dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/status"
-        android:textAlignment="center"
-        android:textSize="16dp"
-        android:padding="16dp"
-        android:background="@color/colorBG"
-        android:textColor="@color/colorText"
+        android:text="100%"
+        android:textSize="96sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:textAlignment="center"
+                android:text="Power Source"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textAlignment="center"
+                android:text="AC"
+                android:id="@+id/psource"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:textAlignment="center"
+                android:text="Status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:textAlignment="center"
+                android:text="Charging"
+                android:id="@+id/cstatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:textAlignment="center"
+        android:textStyle="italic"
+        android:text="Alerts are muted between 9 pm to 6 am"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:padding="8sp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/scheduleJob"
-            android:text="Start"
+        <TextView
             android:layout_weight="1"
-            android:background="@color/colorHappy"
-            android:textColor="@color/colorText"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"/>
-        <Button
-            android:id="@+id/cancelJob"
-            android:text="Stop"
+            android:text="Alerts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Switch
             android:layout_weight="1"
-            android:background="@color/colorDanger"
-            android:textColor="@color/colorText"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"/>
+            android:id="@+id/jstatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </LinearLayout>
