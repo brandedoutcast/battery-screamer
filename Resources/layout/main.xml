@@ -22,13 +22,11 @@
         android:background="@color/colorBG"
         android:textColor="@color/colorText"
         android:textSize="28dp"
-        android:text="info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/status"
         android:textAlignment="center"
-        android:text="status"
         android:textSize="16dp"
         android:padding="16dp"
         android:background="@color/colorBG"

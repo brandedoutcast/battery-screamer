@@ -12,13 +12,14 @@ namespace BatteryScreamer
     {
         bool IsCancelled;
         MediaPlayer Player;
+        const double LOW = 0.2, HIGH = 0.9;
 
         public override bool OnStartJob(JobParameters args)
         {
-            SetupPlayer();
-            Battery.BatteryInfoChanged += (_, e) =>
+            Battery.BatteryInfoChanged += delegate
             {
-                if ((e.ChargeLevel <= 25 && e.PowerSource == BatteryPowerSource.AC) || (e.ChargeLevel >= 90 && e.PowerSource == BatteryPowerSource.Battery)) Player.Stop();
+                if ((Battery.ChargeLevel <= LOW && Battery.PowerSource == BatteryPowerSource.AC) || (Battery.ChargeLevel >= HIGH && Battery.PowerSource == BatteryPowerSource.Battery))
+                    Player?.Stop();
             };
             DoWork(args);
             return true;
@@ -34,27 +35,30 @@ namespace BatteryScreamer
         {
             Task.Run(() =>
             {
-                var Level = Battery.ChargeLevel * 100;
-
                 if (IsCancelled)
                 {
-                    Player.Stop();
+                    Player?.Stop();
                     return;
                 }
 
-                if (((Level <= 25 && Battery.PowerSource == BatteryPowerSource.Battery) || (Level >= 90 && Battery.PowerSource == BatteryPowerSource.AC)) && DateTime.Now.Hour >= 6 && DateTime.Now.Hour <= 21)
-                    Player.Prepare();
+                if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour <= 21)
+                {
+                    if (Battery.ChargeLevel <= LOW && Battery.PowerSource == BatteryPowerSource.Battery) SetupPlayer("low");
+                    else if (Battery.ChargeLevel >= HIGH && Battery.PowerSource == BatteryPowerSource.AC) SetupPlayer("high");
+                }
 
                 JobFinished(args, false);
             });
         }
 
-        void SetupPlayer()
+        void SetupPlayer(string assetName)
         {
-            var Descriptor = Assets.OpenFd("alert.mp3");
-            Player = new MediaPlayer { Looping = true };
+            var Descriptor = Assets.OpenFd($"{assetName}.mp3");
+            Player = new MediaPlayer();
             Player.Prepared += (s, e) => Player.Start();
             Player.SetDataSource(Descriptor.FileDescriptor, Descriptor.StartOffset, Descriptor.Length);
+            Player.Prepare();
+            Player.Completion += delegate { Player = null; };
         }
     }
 }

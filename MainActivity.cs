@@ -14,7 +14,6 @@ namespace BatteryScreamer
     [Activity(Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
-        const string TAG = "BATTERY_SCREAMER";
         const int JOB_ID = 41383;
 
         TextView Info, Status;
@@ -73,8 +72,9 @@ namespace BatteryScreamer
             var Component = new ComponentName(this, JavaClass);
             var JobInfo = new JobInfo.Builder(JOB_ID, Component)
                                 .SetRequiredNetworkType(NetworkType.Unmetered)
+                                .SetRequiresDeviceIdle(true)
                                 .SetPersisted(true)
-                                .SetPeriodic(30 * 60 * 1000)
+                                .SetPeriodic(15 * 60 * 1000)
                                 .Build();
 
             var Scheduler = (JobScheduler)GetSystemService(JobSchedulerService);
