@@ -3,6 +3,7 @@ using Android.App.Job;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Widget;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace BatteryScreamer
         const int JOB_ID = 41383;
 
         TextView Info, Status;
-        Button Start, Stop;
+        Button Start, Stop, StopAlert;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -30,6 +31,7 @@ namespace BatteryScreamer
             Status = FindViewById<TextView>(Resource.Id.status);
             Start = FindViewById<Button>(Resource.Id.scheduleJob);
             Stop = FindViewById<Button>(Resource.Id.cancelJob);
+            StopAlert = FindViewById<Button>(Resource.Id.stopAlert);
 
             Init();
         }
@@ -38,6 +40,7 @@ namespace BatteryScreamer
         {
             Start.Click += delegate { ScheduleJob(); };
             Stop.Click += delegate { CancelJob(); };
+            StopAlert.Click += delegate { StopPlay(); };
 
             UpdateInfo();
             Battery.BatteryInfoChanged += delegate { UpdateInfo(); };
@@ -74,7 +77,8 @@ namespace BatteryScreamer
             var JobInfo = new JobInfo.Builder(JOB_ID, Component)
                                 .SetRequiredNetworkType(NetworkType.Unmetered)
                                 .SetPersisted(true)
-                                .SetPeriodic(30 * 60 * 1000)
+                                .SetRequiresDeviceIdle(true)
+                                .SetPeriodic(15 * 60 * 1000)
                                 .Build();
 
             var Scheduler = (JobScheduler)GetSystemService(JobSchedulerService);
@@ -87,6 +91,40 @@ namespace BatteryScreamer
             var Scheduler = (JobScheduler)GetSystemService(JobSchedulerService);
             Scheduler.Cancel(JOB_ID);
             UpdateJobStatus(false);
+        }
+
+        void StopPlay()
+        {
+            var notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            NotificationCompat.Builder builder;
+            var soundUri = Android.Net.Uri.Parse("android.resource://com.rohith.batteryscreamer/raw/high");
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                var importance = NotificationImportance.High;
+                NotificationChannel channel = new NotificationChannel("41383", "Battery Screamer", importance);
+                channel.Description = "desc";
+                notificationManager.CreateNotificationChannel(channel);
+
+                builder = new NotificationCompat.Builder(ApplicationContext, "41383");
+            }
+            else
+            {
+                builder = new NotificationCompat.Builder(ApplicationContext);
+            }
+
+            builder.SetSmallIcon(Resource.Drawable.navigation_empty_icon)
+                .SetContentTitle("Battery Screamer")
+                .SetAutoCancel(true)
+                .SetSound(soundUri);
+
+            Notification mNotification = builder.Build();
+
+            mNotification.Flags |= NotificationFlags.Insistent | NotificationFlags.HighPriority;
+
+            StartForegroundService(mNotification);
+
+            notificationManager.Notify(41383, mNotification);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
