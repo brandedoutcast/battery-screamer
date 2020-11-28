@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Battery Screamer</string>
+  <string name="appName">Battery Screamer</string>
+  <string name="alertsTxt">Alerts</string>
+  <string name="muteTxt">Mute</string>
+  <string name="lowTxt">Low</string>
+  <string name="highTxt">High</string>
+  <string name="statusTxt">Status</string>
 </resources>
